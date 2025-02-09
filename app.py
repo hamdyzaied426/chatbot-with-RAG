@@ -11,7 +11,8 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 try:
     api_key = st.secrets["GOOGLE_API_KEY"]
 except Exception:
-    api_key = os.getenv("GOOGLE_API_KEY")
+    # Use os.getenv and supply a fallback default value (provided key)
+    api_key = os.getenv("GOOGLE_API_KEY", "B5ACE85B-B14D-4968-822A-C2740BC6A061/20250209200343")
 
 if not api_key:
     st.error("GOOGLE_API_KEY not found. Please set it in .streamlit/secrets.toml or as an environment variable.")
