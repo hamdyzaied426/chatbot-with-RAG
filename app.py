@@ -7,11 +7,12 @@ from langchain_community.vectorstores import FAISS
 import numpy as np
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
+# --- API Key Setup ---
 # Try to obtain the API key from st.secrets first; if not available, use the environment variable.
 try:
     api_key = st.secrets["GOOGLE_API_KEY"]
 except Exception:
-    # Use os.getenv and supply a fallback default value (provided key)
+    # Use os.getenv with a fallback default (your provided API key)
     api_key = os.getenv("GOOGLE_API_KEY", "B5ACE85B-B14D-4968-822A-C2740BC6A061/20250209200343")
 
 if not api_key:
@@ -19,16 +20,19 @@ if not api_key:
 else:
     genai.configure(api_key=api_key)
 
-# Set model and initialize the chat model
+# --- Model and Chat Setup ---
 model = 'models/embedding-001'
 chat_model = genai.GenerativeModel('gemini-1.5-flash')
 
+# --- Functions for PDF Extraction and Vector DB Creation ---
 def extract_from_pdf(pdf_file):
     reader = PdfReader(pdf_file)
     text = ""
     for page in reader.pages:
         if page:
-            text += page.extract_text()
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text
     return text
 
 def google_pdf_gemini_embedding(task_type):
@@ -53,10 +57,10 @@ def get_response(query):
             full_response += res.text
             yield res.text
 
-# Initialize the text splitter
+# --- Initialize Text Splitter ---
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
-# HTML and CSS for the title and subtitle
+# --- Title and CSS Styling ---
 title_html = """
     <style>
     .title {
@@ -78,7 +82,7 @@ title_html = """
     """
 st.markdown(title_html, unsafe_allow_html=True)
 
-# Initialize session state variables if they don't exist
+# --- Initialize Session State ---
 if "pdf" not in st.session_state:
     st.session_state.pdf = None
 if "v_db" not in st.session_state:
@@ -88,7 +92,7 @@ if "texts" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Sidebar: Upload PDF and manage the vector database
+# --- Sidebar: PDF Upload and Vector DB Management ---
 with st.sidebar:
     st.title("Chatbot Controls")
     pdf = st.file_uploader("Upload PDF", type=["pdf"])
@@ -108,27 +112,46 @@ with st.sidebar:
         st.session_state.texts = None
         st.success("Vector database deleted!")
 
-# Display previous chat messages
+# --- Display Previous Chat Messages ---
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-# Chat input and response generation
+# --- Chat Input and Response Generation ---
 user_input = st.chat_input("Enter your message:")
 
 if user_input:
     st.chat_message("user").write(user_input)
     placeholder = st.chat_message("AI").empty()
+    
+    # Base context text for the chatbot
     similar_text = "You are a Multi Task AI Agent. "
+    
+    # Append the new user message to the conversation history
     st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    # If a vector database exists, add similar context from the PDF
     if st.session_state.v_db:
         similar_context = get_similar_context(st.session_state.v_db, user_input, 5)
         for doc in similar_context:
             similar_text += doc.page_content + "\n"
-    conversation_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages])
+    
+    # To avoid overly long input, limit conversation history to the last 3 messages
+    conversation_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages[-3:]])
+    
+    # Combine the conversation history, new query, and similar context
     combined_input = f"{conversation_history}\nuser: {user_input}\nAI: {similar_text}"
+    
     stream_res = ""
     with st.spinner("Thinking..."):
+        # Use the minimal prompt for testing if needed:
+        # test_input = "Hello, how are you?"
+        # for response in get_response(test_input):
+        #     stream_res += response
+        #     placeholder.markdown(stream_res)
+        
+        # Use the combined input
         for response in get_response(combined_input):
             stream_res += response
             placeholder.markdown(stream_res)
+    
     st.session_state.messages.append({"role": "AI", "content": stream_res})
