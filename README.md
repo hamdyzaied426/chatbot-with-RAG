@@ -2,6 +2,11 @@
 
 Gemini PDF Chatbot is a Streamlit-based application that allows users to chat with a conversational AI model trained on PDF documents. The chatbot extracts information from uploaded PDF files and answers user questions based on the provided context.
 
+## Demo Video
+
+[Click here to watch the demo video](https://github.com/hamdyzaied426/chatbot-with-RAG/blob/main/final.mp4)
+
+
 ## Features
 
 - **PDF Upload:** Users can upload multiple PDF files.
