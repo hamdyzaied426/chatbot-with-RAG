@@ -1,0 +1,61 @@
+=============================================================
+          Chatbot Application - Docker Run Instructions
+=============================================================
+
+Prerequisites:
+---------------
+1. Ensure that Docker Desktop is installed and running on your machine.
+   - Verify by running: docker --version
+
+Steps to Pull and Run the Docker Image:
+-----------------------------------------
+
+Step 1: Pull the Docker Image from Docker Hub
+----------------------------------------------
+Run the following command in your terminal or command prompt:
+
+    docker pull hamdyzaied/chatbot-with-rag2:latest
+
+This command downloads the latest version of the image from Docker Hub.
+
+Step 2: Run the Docker Container
+--------------------------------
+Once the image is pulled, run the container with the following command:
+
+    docker run -p 8501:8501 -e GOOGLE_API_KEY=your_api_key_here hamdyzaied/chatbot-with-rag2:latest
+
+Important:
+- Replace "your_api_key_here" with your actual Google API key.
+- The "-p 8501:8501" flag maps port 8501 inside the container to port 8501 on your local machine.
+- The "-e GOOGLE_API_KEY=your_api_key_here" flag passes the required environment variable to the container.
+
+Step 3: Access the Application
+------------------------------
+After running the container, open your web browser and navigate to:
+
+    http://localhost:8501
+
+You should see the Streamlit chatbot application running.
+
+Optional: Running the Container in Detached Mode
+--------------------------------------------------
+If you want the container to run in the background (detached mode), use the -d flag:
+
+    docker run -d -p 8501:8501 -e GOOGLE_API_KEY=your_api_key_here hamdyzaied/chatbot-with-rag2:latest
+
+To stop the running container later:
+1. List running containers with:
+       docker ps
+2. Stop the desired container by running:
+       docker stop <container_id>
+
+Additional Notes:
+-----------------
+- Ensure you have a stable internet connection when pulling the image.
+- If you need to update the image, simply repeat Step 1 to pull the latest version.
+- For any issues, check the container logs with:
+       docker logs <container_id>
+
+=============================================================
+Thank you for using the Chatbot Application!
+=============================================================
