@@ -59,7 +59,7 @@ To pull and run the Docker image for this application, please refer to the [RUN_
 **Quick Start:**
 
 1. Pull the image:
-2. 
+
 ## Local Development
 
 Follow these instructions to set up and run this project on your local machine.
