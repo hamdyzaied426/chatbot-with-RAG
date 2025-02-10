@@ -52,6 +52,14 @@ docs for more detail on building and pushing.
 
 - [Docker's Python guide](https://docs.docker.com/language/python/)
 
+## Running the Application with Docker
+
+To pull and run the Docker image for this application, please refer to the [RUN_INSTRUCTIONS.txt](RUN_INSTRUCTIONS.txt) file which contains detailed steps.
+
+**Quick Start:**
+
+1. Pull the image:
+2. 
 ## Local Development
 
 Follow these instructions to set up and run this project on your local machine.
